@@ -2,9 +2,9 @@ plugins {
     id 'java-library'
     id 'checkstyle'
     id 'pmd'
-    id 'com.github.spotbugs' version '5.0.13'
+    id 'com.github.spotbugs' version '6.0.7'
     id 'org.hidetake.swagger.generator' version '2.19.2'
-    id "com.diffplug.spotless" version "6.14.1"
+    id "com.diffplug.spotless" version "6.25.0"
 }
 
 ext.projectName = "Openbanking client"
@@ -19,16 +19,16 @@ apply from: 'build.publishing.gradle'
 
 group = 'com.transferwise'
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 ext {
     libs = [
-        'spring': '5.3.6',
-        'jackson': '2.12.3',
-        'lombok': '1.18.20',
-        'junit': '5.7.1',
-        'mockito': '3.9.0'
+        'spring' : '6.0.19',
+        'jackson': '2.15.4',
+        'lombok' : '1.18.30',
+        'junit'  : '5.9.3',
+        'mockito': '5.3.1'
     ]
 }
 
@@ -40,11 +40,15 @@ repositories {
 configurations {
     openApiGen
     swaggerCodegenV3
+    // Getting Standard Commons Logging alert. Needs to ignore 'commons-logging'
+    configureEach {
+        exclude group: 'commons-logging', module: 'commons-logging'
+    }
 }
 
 dependencies {
     openApiGen("org.openapitools:openapi-generator-cli:3.3.4")
-    swaggerCodegenV3("io.swagger.codegen.v3:swagger-codegen-cli:3.0.35")
+    swaggerCodegenV3("io.swagger.codegen.v3:swagger-codegen-cli:3.0.57")
     api("org.springframework:spring-web:${libs.spring}")
 
     implementation('org.apache.httpcomponents:httpclient:4.5.14')
@@ -54,27 +58,25 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8:${libs.jackson}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${libs.jackson}")
 
-    api('org.bitbucket.b_c:jose4j:0.9.2')
+    api('org.bitbucket.b_c:jose4j:0.9.6')
+
+    implementation('org.springframework.boot:spring-boot-starter-webflux:3.3.0')
+    implementation('com.github.tomakehurst:wiremock-jre8-standalone:2.35.1')
 
     compileOnly("org.projectlombok:lombok:${libs.lombok}")
     testCompileOnly("org.projectlombok:lombok:${libs.lombok}")
     annotationProcessor("org.projectlombok:lombok:${libs.lombok}")
     testAnnotationProcessor("org.projectlombok:lombok:${libs.lombok}")
 
-    testImplementation("org.junit.jupiter:junit-jupiter:${libs.junit}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${libs.junit}")
-
+    testImplementation("org.junit.jupiter:junit-jupiter:${libs.junit}")
     testImplementation("org.mockito:mockito-core:${libs.mockito}")
     testImplementation("org.mockito:mockito-junit-jupiter:${libs.mockito}")
-
     testImplementation("org.hamcrest:hamcrest:2.2")
     testImplementation("org.skyscreamer:jsonassert:1.5.1")
-
     testImplementation("org.springframework:spring-test:${libs.spring}")
-
     testImplementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-
-    testImplementation("ch.qos.logback:logback-classic:1.4.5")
+    testImplementation("ch.qos.logback:logback-classic:1.5.6")
 }
 
 swaggerSources {
@@ -197,7 +199,7 @@ tasks.withType(Pmd) {
 }
 
 wrapper {
-    gradleVersion = '7.0'
+    gradleVersion = '7.6'
 }
 
 test {
